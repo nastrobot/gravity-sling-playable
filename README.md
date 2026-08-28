@@ -1,6 +1,9 @@
-# 🌌 SINGULARITY: Orbital Gravity Sling
+# 🌌 ORBITA: Zen Kinetic Physics
 
-An unconventional, physics-driven HTML5 playable mobile demo exploring **Newtonian orbital gravity mechanics**, spacetime curvature visualization, and kinetic slingshot flight loops.
+A calming, physics-based slingshot experience exploring **Newtonian orbital gravity mechanics**, spacetime curvature visualization, and kinetic slingshot flight loops.
+
+### 🕹️ [▶ Play Live in Browser (Interactive Demo)](https://nastrobot.github.io/gravity-sling-playable/)
+*(Zero installation required • Locked 60 FPS • Mobile Touch & Desktop Supported)*
 
 Developed with pure **HTML5 Canvas 2D** and the **Web Audio API** with zero external dependencies (<300ms load time).
 
