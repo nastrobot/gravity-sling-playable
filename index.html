@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>SINGULARITY: Orbital Gravity Sling — Innovative Playable Demo</title>
+  <title>ORBITA — Zen Kinetic Physics</title>
   <style>
     * {
       box-sizing: border-box;
@@ -17,22 +17,22 @@
       width: 100%;
       height: 100%;
       overflow: hidden;
-      background: #02040a;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+      background: #e2e8f0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       display: flex;
       justify-content: center;
       align-items: center;
     }
-    #gameWrapper {
+    #gameContainer {
       position: relative;
       width: 100%;
       height: 100%;
-      max-width: 480px;
-      max-height: 940px;
-      background: radial-gradient(circle at 50% 40%, #080d21 0%, #02040a 100%);
+      max-width: 440px;
+      max-height: 880px;
+      background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
       overflow: hidden;
-      box-shadow: 0 0 60px rgba(99, 102, 241, 0.2), 0 25px 50px rgba(0, 0, 0, 0.9);
-      border-radius: 16px;
+      box-shadow: 0 25px 60px -15px rgba(100, 116, 139, 0.3), 0 0 1px 1px rgba(255, 255, 255, 0.8) inset;
+      border-radius: 24px;
     }
     canvas {
       width: 100%;
@@ -40,84 +40,77 @@
       display: block;
     }
 
-    /* Minimalist Space HUD */
+    /* Clean Apple/Monument Valley Aesthetic HUD */
     .hud {
       position: absolute;
-      top: 16px;
-      left: 16px;
-      right: 16px;
+      top: 18px;
+      left: 18px;
+      right: 18px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       pointer-events: none;
       z-index: 10;
     }
-    .hud-chip {
-      background: rgba(15, 23, 42, 0.7);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 6px 14px;
-      border-radius: 20px;
+    .hud-pill {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(226, 232, 240, 0.8);
+      padding: 8px 18px;
+      border-radius: 999px;
       display: flex;
       align-items: center;
       gap: 8px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
     }
     .hud-label {
-      font-size: 10px;
-      font-weight: 800;
-      letter-spacing: 1.2px;
-      color: #94a3b8;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      color: #64748b;
       text-transform: uppercase;
     }
-    .hud-val {
-      font-size: 15px;
-      font-weight: 900;
-      color: #818cf8;
+    .hud-num {
+      font-size: 16px;
+      font-weight: 800;
+      color: #0f172a;
       font-variant-numeric: tabular-nums;
-      text-shadow: 0 0 10px rgba(129, 140, 248, 0.6);
     }
     .hud-timer {
-      color: #38bdf8;
-      text-shadow: 0 0 10px rgba(56, 189, 248, 0.6);
+      color: #3b82f6;
     }
 
-    .energy-bar-container {
+    /* Interactive Helper Hint */
+    .gesture-hint {
       position: absolute;
       bottom: 24px;
-      left: 20px;
-      right: 20px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: #64748b;
       pointer-events: none;
       z-index: 10;
       display: flex;
-      flex-direction: column;
+      justify-content: center;
+      align-items: center;
       gap: 6px;
     }
-    .energy-bar-bg {
-      width: 100%;
-      height: 4px;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 2px;
-      overflow: hidden;
+    .gesture-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #3b82f6;
+      animation: pulse 1.6s infinite;
     }
-    .energy-bar-fill {
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, #6366f1, #38bdf8);
-      border-radius: 2px;
-      transition: width 0.1s linear;
-    }
-    .energy-label {
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 1px;
-      color: #64748b;
-      text-transform: uppercase;
-      display: flex;
-      justify-content: space-between;
+    @keyframes pulse {
+      0%, 100% { transform: scale(0.9); opacity: 0.5; }
+      50% { transform: scale(1.4); opacity: 1; }
     }
 
-    /* Overlays */
+    /* Zen Card Overlays */
     .overlay {
       position: absolute;
       inset: 0;
@@ -125,130 +118,165 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      background: rgba(2, 4, 10, 0.88);
+      background: rgba(248, 250, 252, 0.94);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
-      padding: 30px;
+      padding: 32px;
       text-align: center;
       z-index: 20;
+      transition: opacity 0.3s ease;
     }
     .hidden {
       display: none !important;
     }
-    .tag {
+    .pill-badge {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background: rgba(99, 102, 241, 0.15);
-      border: 1px solid rgba(99, 102, 241, 0.4);
-      padding: 4px 14px;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      padding: 5px 14px;
       border-radius: 999px;
-      color: #a5b4fc;
+      color: #2563eb;
       font-size: 11px;
       font-weight: 800;
-      letter-spacing: 1.5px;
+      letter-spacing: 1px;
       text-transform: uppercase;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
     }
     .title {
-      font-size: 34px;
+      font-size: 32px;
       font-weight: 900;
+      color: #0f172a;
       letter-spacing: -0.5px;
-      color: #ffffff;
-      text-transform: uppercase;
-      line-height: 1.1;
+      line-height: 1.15;
       margin-bottom: 12px;
-      background: linear-gradient(135deg, #ffffff 40%, #818cf8 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
     }
-    .desc {
-      color: #94a3b8;
+    .subtitle {
+      color: #475569;
       font-size: 14px;
-      line-height: 1.55;
-      margin-bottom: 28px;
+      line-height: 1.6;
+      margin-bottom: 24px;
       max-width: 320px;
     }
-    .btn-action {
-      background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%);
+    
+    /* Tutorial Steps Visual Box */
+    .steps-box {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 26px;
+      text-align: left;
+      width: 100%;
+      max-width: 330px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    }
+    .step-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 10px;
+      font-size: 12.5px;
+      color: #334155;
+      line-height: 1.45;
+    }
+    .step-item:last-child {
+      margin-bottom: 0;
+    }
+    .step-num {
+      background: #e0f2fe;
+      color: #0284c7;
+      font-weight: 800;
+      font-size: 11px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .btn-zen {
+      background: #0f172a;
       color: #ffffff;
       border: none;
-      padding: 16px 40px;
-      border-radius: 14px;
-      font-size: 16px;
+      padding: 16px 42px;
+      border-radius: 999px;
+      font-size: 15px;
       font-weight: 800;
-      letter-spacing: 0.8px;
+      letter-spacing: 0.5px;
       cursor: pointer;
-      box-shadow: 0 0 35px rgba(99, 102, 241, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.4);
-      transition: transform 0.1s ease, box-shadow 0.1s ease;
-      touch-action: manipulation;
+      box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.3);
+      transition: transform 0.12s, box-shadow 0.12s;
     }
-    .btn-action:active {
-      transform: scale(0.96);
-      box-shadow: 0 0 15px rgba(99, 102, 241, 0.8);
-    }
-    .mechanic-tip {
-      margin-top: 24px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px dashed rgba(255, 255, 255, 0.15);
-      border-radius: 12px;
-      padding: 12px 18px;
-      font-size: 12px;
-      color: #cbd5e1;
-      line-height: 1.5;
-    }
-    .mechanic-tip strong {
-      color: #38bdf8;
+    .btn-zen:active {
+      transform: scale(0.97);
+      box-shadow: 0 5px 15px -3px rgba(15, 23, 42, 0.4);
     }
   </style>
 </head>
 <body>
-  <div id="gameWrapper">
+  <div id="gameContainer">
     <canvas id="gameCanvas"></canvas>
 
-    <!-- Top HUD -->
+    <!-- Zen HUD -->
     <div class="hud">
-      <div class="hud-chip">
-        <span class="hud-label">COSMIC FLUX</span>
-        <span class="hud-val" id="scoreVal">0</span>
+      <div class="hud-pill">
+        <span class="hud-label">Rings</span>
+        <span class="hud-num" id="scoreVal">0</span>
       </div>
-      <div class="hud-chip">
-        <span class="hud-label">TIME WARP</span>
-        <span class="hud-val hud-timer" id="timeVal">30s</span>
+      <div class="hud-pill">
+        <span class="hud-label">Flow</span>
+        <span class="hud-num hud-timer" id="timeVal">30s</span>
       </div>
     </div>
 
-    <!-- Bottom Energy Bar -->
-    <div class="energy-bar-container">
-      <div class="energy-label">
-        <span>GRAVITATIONAL ANCHOR</span>
-        <span id="anchorStatus" style="color:#38bdf8;">READY</span>
-      </div>
-      <div class="energy-bar-bg">
-        <div class="energy-bar-fill" id="energyFill"></div>
-      </div>
+    <!-- Bottom Gesture Guide -->
+    <div class="gesture-hint" id="gestureHint">
+      <div class="gesture-dot"></div>
+      <span id="hintText">HOLD ANYWHERE TO ATTRACT • RELEASE TO SLING</span>
     </div>
 
     <!-- Start Overlay -->
     <div class="overlay" id="startOverlay">
-      <div class="tag">🌌 UNCONVENTIONAL MECHANICS</div>
-      <h1 class="title">SINGULARITY<br/>ORBITAL SLING</h1>
-      <p class="desc">You don't steer with joysticks. <b>Touch or click anywhere to manifest a Black Hole.</b> Your quantum probe will slingshot around it using real gravitational orbital mechanics!</p>
-      <button class="btn-action" id="startBtn">BEGIN ORBIT</button>
-      <div class="mechanic-tip">
-        <strong>💡 HOW TO PLAY:</strong><br/>
-        Press & Hold to create gravity well → Orbit & build velocity → Release to slingshot across space!
+      <div class="pill-badge">✨ KINETIC HARMONY</div>
+      <h1 class="title">ORBITA</h1>
+      <p class="subtitle">A calming, physics-based slingshot experience. Guide the chrome marble through golden rings using dynamic magnetic gravity.</p>
+      
+      <!-- Animated Visual Demo Box -->
+      <div style="width:100%; max-width:320px; height:120px; background:#ffffff; border:1px solid #e2e8f0; border-radius:18px; margin-bottom:18px; position:relative; overflow:hidden; box-shadow:0 6px 18px rgba(0,0,0,0.03); display:flex; align-items:center; justify-content:center;">
+        <canvas id="tutorialCanvas" width="320" height="120" style="width:100%; height:100%; display:block;"></canvas>
       </div>
+
+      <!-- 3 Clear Visual Steps -->
+      <div class="steps-box">
+        <div class="step-item">
+          <div class="step-num">1</div>
+          <div><b>Ekrana Basılı Tut / Hold:</b> Parmağın mıknatıs olur. Bilye parmağına çekilip dönmeye başlar.</div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">2</div>
+          <div><b>Halkaya Doğru Dönüşünü İzle:</b> Bilye dönerken gideceği rota kesik çizgilerle gösterilir.</div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">3</div>
+          <div><b>Elini Kaldır / Release:</b> Altın halkaya denk gelince bırak, bilye sapan gibi fırlasın!</div>
+        </div>
+      </div>
+
+      <button class="btn-zen" id="startBtn">BEGIN FLOW</button>
     </div>
 
     <!-- End Game Overlay -->
     <div class="overlay hidden" id="endOverlay">
-      <div class="tag" id="endTag">TRAJECTORY COMPLETE</div>
-      <h1 class="title" id="endTitle">HYPERDRIVE ACHIEVED</h1>
-      <p class="desc" id="endDesc">Final Cosmic Flux collected: <strong id="finalFlux" style="color:#818cf8;">0</strong></p>
-      <button class="btn-action" id="ctaBtn" onclick="alert('Demo finished! Built with HTML5 Canvas 2D Physics & Orbital Simulation by Nasrullah Gullac.')">EXPLORE NEXT GALAXY</button>
-      <div style="margin-top: 16px;">
-        <button id="retryBtn" style="background:transparent; border:1px solid rgba(255,255,255,0.2); color:#94a3b8; padding:8px 24px; border-radius:999px; font-size:12px; font-weight:700; cursor:pointer;">RETRY RUN</button>
+      <div class="pill-badge">HARMONY ACHIEVED</div>
+      <h1 class="title">FLOW COMPLETE</h1>
+      <p class="subtitle">You guided the marble through <strong id="finalScore" style="color:#0f172a; font-size:18px;">0</strong> golden rings.</p>
+      <button class="btn-zen" id="ctaBtn" onclick="alert('Stage Complete! Crafted with pure HTML5 Canvas & Web Audio by Nasrullah Gullac.')">NEXT CHAMBER</button>
+      <div style="margin-top: 14px;">
+        <button id="retryBtn" style="background:transparent; border:none; color:#64748b; font-size:13px; font-weight:700; cursor:pointer; text-decoration:underline;">REPLAY CHAMBER</button>
       </div>
     </div>
   </div>
@@ -258,14 +286,12 @@
     const ctx = canvas.getContext('2d');
     const scoreVal = document.getElementById('scoreVal');
     const timeVal = document.getElementById('timeVal');
-    const energyFill = document.getElementById('energyFill');
-    const anchorStatus = document.getElementById('anchorStatus');
+    const hintText = document.getElementById('hintText');
     const startOverlay = document.getElementById('startOverlay');
     const endOverlay = document.getElementById('endOverlay');
     const startBtn = document.getElementById('startBtn');
     const retryBtn = document.getElementById('retryBtn');
-    const finalFlux = document.getElementById('finalFlux');
-    const endTitle = document.getElementById('endTitle');
+    const finalScore = document.getElementById('finalScore');
 
     let W = 360;
     let H = 640;
@@ -280,7 +306,7 @@
     window.addEventListener('resize', resize);
     resize();
 
-    // Audio Engine: Ambient Synthesizer + Harmonic Chimes
+    // Harmonic Kalimba & Water Drop Web Audio Sound Engine
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     let actx = null;
 
@@ -289,214 +315,145 @@
       if (actx.state === 'suspended') actx.resume();
     }
 
-    function playSound(type) {
+    function playNote(freq, dur = 0.5, type = 'sine') {
       if (!actx) return;
       try {
-        const now = actx.currentTime;
-        if (type === 'gravity') {
-          // Low gravity resonance hum
-          const osc = actx.createOscillator();
-          const gain = actx.createGain();
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(65, now);
-          osc.frequency.exponentialRampToValueAtTime(110, now + 0.3);
-          gain.gain.setValueAtTime(0.18, now);
-          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
-          osc.connect(gain);
-          gain.connect(actx.destination);
-          osc.start(now);
-          osc.stop(now + 0.3);
-        } else if (type === 'shard') {
-          // Glass harmonic chime
-          const osc = actx.createOscillator();
-          const gain = actx.createGain();
-          osc.type = 'triangle';
-          osc.frequency.setValueAtTime(740, now);
-          osc.frequency.exponentialRampToValueAtTime(1480, now + 0.15);
-          gain.gain.setValueAtTime(0.2, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
-          osc.connect(gain);
-          gain.connect(actx.destination);
-          osc.start(now);
-          osc.stop(now + 0.25);
-        } else if (type === 'portal') {
-          // Major chord arpeggio
-          [523.25, 659.25, 783.99, 1046.5].forEach((freq, idx) => {
-            const osc = actx.createOscillator();
-            const gain = actx.createGain();
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(freq, now + idx * 0.05);
-            gain.gain.setValueAtTime(0.12, now + idx * 0.05);
-            gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.05 + 0.3);
-            osc.connect(gain);
-            gain.connect(actx.destination);
-            osc.start(now + idx * 0.05);
-            osc.stop(now + idx * 0.05 + 0.3);
-          });
-        } else if (type === 'hazard') {
-          // Sub distortion crash
-          const osc = actx.createOscillator();
-          const gain = actx.createGain();
-          osc.type = 'sawtooth';
-          osc.frequency.setValueAtTime(140, now);
-          osc.frequency.exponentialRampToValueAtTime(30, now + 0.35);
-          gain.gain.setValueAtTime(0.3, now);
-          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
-          osc.connect(gain);
-          gain.connect(actx.destination);
-          osc.start(now);
-          osc.stop(now + 0.35);
-        }
+        const osc = actx.createOscillator();
+        const gain = actx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, actx.currentTime);
+        gain.gain.setValueAtTime(0.2, actx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, actx.currentTime + dur);
+        osc.connect(gain);
+        gain.connect(actx.destination);
+        osc.start();
+        osc.stop(actx.currentTime + dur);
       } catch (e) {}
     }
 
-    // Game State
+    function soundMagnet() {
+      playNote(220, 0.4, 'sine');
+    }
+    function soundCollect(combo = 1) {
+      const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51];
+      const freq = notes[Math.min(notes.length - 1, combo)];
+      playNote(freq, 0.35, 'triangle');
+    }
+    function soundBounce() {
+      playNote(140, 0.25, 'sine');
+    }
+
+    // State Variables
     let state = 'START';
     let score = 0;
+    let combo = 0;
     let timeLeft = 30;
     let timerInt = null;
     let frame = 0;
-    let shake = 0;
 
-    // Active Gravity Singularity (Created by User Touch/Hold)
-    const gravityWell = {
+    // The Marble (Player)
+    const marble = {
+      x: 180,
+      y: 450,
+      vx: 3.2,
+      vy: -2.0,
+      radius: 12,
+      trail: [],
+      maxSpeed: 13
+    };
+
+    // Active Magnetic Attraction Point
+    const magnet = {
       active: false,
       x: 0,
       y: 0,
-      mass: 850,
-      radius: 36,
-      pulse: 0
+      strength: 780,
+      ripple: 0
     };
 
-    // Quantum Probe (Player Particle)
-    const probe = {
-      x: 180,
-      y: 400,
-      vx: 3.5,
-      vy: -2.0,
-      radius: 7,
-      trail: [],
-      maxSpeed: 14
-    };
+    // Targets & Obstacles
+    let rings = [];
+    let blocks = [];
+    let ripples = [];
+    let sparkles = [];
+    let popups = [];
 
-    // Space Objects
-    let starshards = [];
-    let portals = [];
-    let voids = [];
-    let particles = [];
-    let callouts = [];
-    let bgStars = [];
-
-    // Background cosmic starfield
-    for (let i = 0; i < 55; i++) {
-      bgStars.push({
-        x: Math.random() * W,
-        y: Math.random() * H,
-        size: Math.random() * 2 + 0.5,
-        alpha: Math.random() * 0.6 + 0.3,
-        flicker: Math.random() * Math.PI
-      });
-    }
-
-    // Touch / Pointer Input: Gravity Beacon Creation
-    function handlePointerDown(e) {
+    // Pointer Gestures
+    function onPointerDown(e) {
       initAudio();
       if (state !== 'PLAYING') return;
       const rect = canvas.getBoundingClientRect();
       const cx = e.touches ? e.touches[0].clientX : e.clientX;
       const cy = e.touches ? e.touches[0].clientY : e.clientY;
-      gravityWell.active = true;
-      gravityWell.x = cx - rect.left;
-      gravityWell.y = cy - rect.top;
-      playSound('gravity');
-      anchorStatus.innerText = 'SINGULARITY ACTIVE';
-      anchorStatus.style.color = '#818cf8';
+      magnet.active = true;
+      magnet.x = cx - rect.left;
+      magnet.y = cy - rect.top;
+      soundMagnet();
+      hintText.innerText = 'MAGNET ACTIVE: WATCH TRAJECTORY & RELEASE';
     }
 
-    function handlePointerMove(e) {
-      if (!gravityWell.active || state !== 'PLAYING') return;
+    function onPointerMove(e) {
+      if (!magnet.active || state !== 'PLAYING') return;
       const rect = canvas.getBoundingClientRect();
       const cx = e.touches ? e.touches[0].clientX : e.clientX;
       const cy = e.touches ? e.touches[0].clientY : e.clientY;
-      gravityWell.x = cx - rect.left;
-      gravityWell.y = cy - rect.top;
+      magnet.x = cx - rect.left;
+      magnet.y = cy - rect.top;
     }
 
-    function handlePointerUp() {
-      if (gravityWell.active) {
-        gravityWell.active = false;
-        anchorStatus.innerText = 'READY (TAP TO ANCHOR)';
-        anchorStatus.style.color = '#38bdf8';
+    function onPointerUp() {
+      if (magnet.active) {
+        magnet.active = false;
+        hintText.innerText = 'HOLD TO ATTRACT • RELEASE TO SLING';
       }
     }
 
-    window.addEventListener('pointerdown', handlePointerDown);
-    window.addEventListener('pointermove', handlePointerMove);
-    window.addEventListener('pointerup', handlePointerUp);
-    window.addEventListener('touchmove', handlePointerMove, { passive: false });
+    window.addEventListener('pointerdown', onPointerDown);
+    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointerup', onPointerUp);
+    window.addEventListener('touchmove', onPointerMove, { passive: false });
 
-    // Keyboard support: Spacebar to toggle gravity well at center
-    window.addEventListener('keydown', (e) => {
-      if (e.code === 'Space' && !gravityWell.active && state === 'PLAYING') {
-        gravityWell.active = true;
-        gravityWell.x = probe.x + (probe.vx > 0 ? 80 : -80);
-        gravityWell.y = probe.y + (probe.vy > 0 ? 80 : -80);
-        playSound('gravity');
+    function spawnTargets() {
+      // Golden Brass Rings
+      if (rings.length < 4) {
+        rings.push({
+          x: 45 + Math.random() * (W - 90),
+          y: 70 + Math.random() * (H - 160),
+          radius: 18,
+          pulse: Math.random() * Math.PI,
+          collected: false
+        });
       }
-    });
-    window.addEventListener('keyup', (e) => {
-      if (e.code === 'Space') handlePointerUp();
-    });
 
-    function addCallout(x, y, text, color = '#818cf8') {
-      callouts.push({ x, y, text, color, alpha: 1, dy: -1.6 });
+      // Obsidian Obstacles (Smooth pill blocks)
+      if (blocks.length < 2) {
+        blocks.push({
+          x: 60 + Math.random() * (W - 120),
+          y: 80 + Math.random() * (H - 180),
+          w: 48,
+          h: 22,
+          vx: (Math.random() - 0.5) * 0.8,
+          vy: (Math.random() - 0.5) * 0.8
+        });
+      }
     }
 
-    function spawnBurst(x, y, color = '#38bdf8', count = 18) {
-      for (let i = 0; i < count; i++) {
+    function addPopup(x, y, text) {
+      popups.push({ x, y, text, alpha: 1, dy: -1.2 });
+    }
+
+    function addSparkles(x, y, color = '#f59e0b') {
+      for (let i = 0; i < 14; i++) {
         const ang = Math.random() * Math.PI * 2;
-        const spd = 2 + Math.random() * 5;
-        particles.push({
+        const spd = 1.5 + Math.random() * 4;
+        sparkles.push({
           x, y,
           vx: Math.cos(ang) * spd,
           vy: Math.sin(ang) * spd,
-          color,
           size: Math.random() * 3 + 1.5,
+          color,
           alpha: 1,
           decay: 0.03 + Math.random() * 0.02
-        });
-      }
-    }
-
-    function spawnCosmicEntities() {
-      // Shards
-      if (starshards.length < 5) {
-        starshards.push({
-          x: 40 + Math.random() * (W - 80),
-          y: 60 + Math.random() * (H - 140),
-          radius: 10,
-          rot: 0,
-          pulse: Math.random() * Math.PI
-        });
-      }
-      // Portals
-      if (portals.length < 2) {
-        portals.push({
-          x: 50 + Math.random() * (W - 100),
-          y: 70 + Math.random() * (H - 160),
-          radius: 22,
-          rot: 0
-        });
-      }
-      // Void Hazards
-      if (voids.length < 3) {
-        voids.push({
-          x: 50 + Math.random() * (W - 100),
-          y: 70 + Math.random() * (H - 160),
-          radius: 18,
-          rot: 0,
-          vx: (Math.random() - 0.5) * 1.2,
-          vy: (Math.random() - 0.5) * 1.2
         });
       }
     }
@@ -505,24 +462,24 @@
       initAudio();
       state = 'PLAYING';
       score = 0;
+      combo = 0;
       timeLeft = 30;
       scoreVal.innerText = '0';
       timeVal.innerText = '30s';
-      gravityWell.active = false;
+      magnet.active = false;
 
-      probe.x = W / 2;
-      probe.y = H - 150;
-      probe.vx = 4;
-      probe.vy = -3;
-      probe.trail = [];
+      marble.x = W / 2;
+      marble.y = H - 140;
+      marble.vx = 3.5;
+      marble.vy = -2.5;
+      marble.trail = [];
 
-      starshards = [];
-      portals = [];
-      voids = [];
-      particles = [];
-      callouts = [];
+      rings = [];
+      blocks = [];
+      sparkles = [];
+      popups = [];
 
-      for (let i = 0; i < 4; i++) spawnCosmicEntities();
+      for (let i = 0; i < 4; i++) spawnTargets();
 
       startOverlay.classList.add('hidden');
       endOverlay.classList.add('hidden');
@@ -532,253 +489,168 @@
         if (state !== 'PLAYING') return;
         timeLeft--;
         timeVal.innerText = timeLeft + 's';
-        energyFill.style.width = (timeLeft / 30 * 100) + '%';
-        if (timeLeft <= 0) {
-          endGame();
-        }
+        if (timeLeft <= 0) endGame();
       }, 1000);
     }
 
     function endGame() {
       state = 'END';
       if (timerInt) clearInterval(timerInt);
-      finalFlux.innerText = score;
-      endTitle.innerText = score > 1500 ? 'COSMIC MASTER!' : 'WARP COMPLETE';
+      finalScore.innerText = score;
       endOverlay.classList.remove('hidden');
     }
 
     startBtn.addEventListener('click', startGame);
     retryBtn.addEventListener('click', startGame);
 
-    // Update Physics
+    // Physics Update
     function update() {
       frame++;
 
       if (state !== 'PLAYING') return;
 
-      // Newtonian Gravitational Pull to Active Gravity Well: F = G * M / r^2
-      if (gravityWell.active) {
-        const dx = gravityWell.x - probe.x;
-        const dy = gravityWell.y - probe.y;
+      // Magnetic Attraction Physics (Smooth orbital slingshot)
+      if (magnet.active) {
+        const dx = magnet.x - marble.x;
+        const dy = magnet.y - marble.y;
         const distSq = dx * dx + dy * dy;
         const dist = Math.sqrt(distSq);
 
-        if (dist > 18) {
-          // Gravitational acceleration
-          const force = Math.min(1.4, (gravityWell.mass / Math.max(1200, distSq)) * 1.8);
-          probe.vx += (dx / dist) * force;
-          probe.vy += (dy / dist) * force;
-        } else {
-          // Slingshot catapult escape when very close
-          probe.vx += (Math.random() - 0.5) * 2;
-          probe.vy += (Math.random() - 0.5) * 2;
+        if (dist > 16) {
+          const force = Math.min(1.3, (magnet.strength / Math.max(900, distSq)) * 1.6);
+          marble.vx += (dx / dist) * force;
+          marble.vy += (dy / dist) * force;
         }
-        gravityWell.pulse += 0.15;
+        magnet.ripple += 0.08;
       }
 
-      // Max Speed Clamping & Movement
-      const currentSpeed = Math.hypot(probe.vx, probe.vy);
-      if (currentSpeed > probe.maxSpeed) {
-        probe.vx = (probe.vx / currentSpeed) * probe.maxSpeed;
-        probe.vy = (probe.vy / currentSpeed) * probe.maxSpeed;
+      // Max Speed
+      const speed = Math.hypot(marble.vx, marble.vy);
+      if (speed > marble.maxSpeed) {
+        marble.vx = (marble.vx / speed) * marble.maxSpeed;
+        marble.vy = (marble.vy / speed) * marble.maxSpeed;
       }
 
-      probe.x += probe.vx;
-      probe.y += probe.vy;
+      marble.x += marble.vx;
+      marble.y += marble.vy;
 
-      // Elastic Wall Bounces (Cosmic forcefields)
-      if (probe.x < probe.radius + 8) {
-        probe.x = probe.radius + 8;
-        probe.vx = -probe.vx * 0.9;
-        spawnBurst(probe.x, probe.y, '#6366f1', 6);
+      // Soft Wall Cushions
+      const pad = marble.radius + 10;
+      if (marble.x < pad) {
+        marble.x = pad;
+        marble.vx = -marble.vx * 0.88;
+        soundBounce();
       }
-      if (probe.x > W - probe.radius - 8) {
-        probe.x = W - probe.radius - 8;
-        probe.vx = -probe.vx * 0.9;
-        spawnBurst(probe.x, probe.y, '#6366f1', 6);
+      if (marble.x > W - pad) {
+        marble.x = W - pad;
+        marble.vx = -marble.vx * 0.88;
+        soundBounce();
       }
-      if (probe.y < probe.radius + 50) {
-        probe.y = probe.radius + 50;
-        probe.vy = -probe.vy * 0.9;
-        spawnBurst(probe.x, probe.y, '#6366f1', 6);
+      if (marble.y < pad + 40) {
+        marble.y = pad + 40;
+        marble.vy = -marble.vy * 0.88;
+        soundBounce();
       }
-      if (probe.y > H - probe.radius - 50) {
-        probe.y = H - probe.radius - 50;
-        probe.vy = -probe.vy * 0.9;
-        spawnBurst(probe.x, probe.y, '#6366f1', 6);
+      if (marble.y > H - pad - 40) {
+        marble.y = H - pad - 40;
+        marble.vy = -marble.vy * 0.88;
+        soundBounce();
       }
 
-      // Probe Trail
-      probe.trail.unshift({ x: probe.x, y: probe.y, alpha: 1.0 });
-      if (probe.trail.length > 22) probe.trail.pop();
+      // Trail
+      marble.trail.unshift({ x: marble.x, y: marble.y, alpha: 1.0 });
+      if (marble.trail.length > 18) marble.trail.pop();
 
-      // Collect Starshards
-      for (let i = starshards.length - 1; i >= 0; i--) {
-        const s = starshards[i];
-        s.rot += 0.03;
-        s.pulse += 0.08;
-        const d = Math.hypot(s.x - probe.x, s.y - probe.y);
-        if (d < probe.radius + s.radius + 6) {
-          playSound('shard');
-          score += 100;
+      // Collect Rings
+      for (let i = rings.length - 1; i >= 0; i--) {
+        const r = rings[i];
+        r.pulse += 0.05;
+        const dist = Math.hypot(r.x - marble.x, r.y - marble.y);
+        if (dist < r.radius + marble.radius) {
+          combo++;
+          soundCollect(combo);
+          const pts = 100 * combo;
+          score += pts;
           scoreVal.innerText = score;
-          spawnBurst(s.x, s.y, '#38bdf8', 16);
-          addCallout(s.x, s.y, '+100 FLUX', '#38bdf8');
-          starshards.splice(i, 1);
+          addSparkles(r.x, r.y, '#f59e0b');
+          addPopup(r.x, r.y, combo > 1 ? `+${pts} (${combo}x)` : `+${pts}`);
+          rings.splice(i, 1);
         }
       }
 
-      // Quantum Portals (Warp Gate Boost)
-      for (let i = portals.length - 1; i >= 0; i--) {
-        const p = portals[i];
-        p.rot += 0.05;
-        const d = Math.hypot(p.x - probe.x, p.y - probe.y);
-        if (d < probe.radius + p.radius) {
-          playSound('portal');
-          score += 300;
-          scoreVal.innerText = score;
-          // Slingshot hyper boost!
-          probe.vx *= 1.4;
-          probe.vy *= 1.4;
-          shake = 12;
-          spawnBurst(p.x, p.y, '#818cf8', 24);
-          addCallout(p.x, p.y, '⚡ ORBITAL SLINGSHOT x2', '#818cf8');
-          portals.splice(i, 1);
-        }
-      }
+      // Collide Obsidian Blocks
+      for (let b of blocks) {
+        b.x += b.vx;
+        b.y += b.vy;
+        if (b.x < 40 || b.x > W - 40) b.vx *= -1;
+        if (b.y < 70 || b.y > H - 70) b.vy *= -1;
 
-      // Void Hazards
-      for (let i = voids.length - 1; i >= 0; i--) {
-        const v = voids[i];
-        v.rot -= 0.04;
-        v.x += v.vx;
-        v.y += v.vy;
-        if (v.x < 30 || v.x > W - 30) v.vx *= -1;
-        if (v.y < 60 || v.y > H - 60) v.vy *= -1;
-
-        const d = Math.hypot(v.x - probe.x, v.y - probe.y);
-        if (d < probe.radius + v.radius) {
-          playSound('hazard');
-          shake = 16;
-          score = Math.max(0, score - 150);
-          scoreVal.innerText = score;
-          // Deflection kickback
-          probe.vx = -probe.vx * 1.2;
-          probe.vy = -probe.vy * 1.2;
-          spawnBurst(v.x, v.y, '#f43f5e', 20);
-          addCallout(probe.x, probe.y, '-150 GRAVITY DISRUPTION', '#f43f5e');
+        const dist = Math.hypot(b.x - marble.x, b.y - marble.y);
+        if (dist < b.w / 2 + marble.radius) {
+          combo = 0;
+          soundBounce();
+          marble.vx = -marble.vx * 1.1;
+          marble.vy = -marble.vy * 1.1;
+          addSparkles(marble.x, marble.y, '#64748b');
+          addPopup(marble.x, marble.y, 'DEFLECT');
           break;
         }
       }
 
-      // Spawn new items periodically
-      if (frame % 90 === 0) spawnCosmicEntities();
+      if (frame % 80 === 0) spawnTargets();
 
-      // Particles
-      for (let i = particles.length - 1; i >= 0; i--) {
-        const pt = particles[i];
-        pt.x += pt.vx;
-        pt.y += pt.vy;
-        pt.alpha -= pt.decay;
-        if (pt.alpha <= 0) particles.splice(i, 1);
+      // Sparkles
+      for (let i = sparkles.length - 1; i >= 0; i--) {
+        const sp = sparkles[i];
+        sp.x += sp.vx;
+        sp.y += sp.vy;
+        sp.alpha -= sp.decay;
+        if (sp.alpha <= 0) sparkles.splice(i, 1);
       }
 
-      // Callouts
-      for (let i = callouts.length - 1; i >= 0; i--) {
-        const c = callouts[i];
-        c.y += c.dy;
-        c.alpha -= 0.025;
-        if (c.alpha <= 0) callouts.splice(i, 1);
+      // Popups
+      for (let i = popups.length - 1; i >= 0; i--) {
+        const p = popups[i];
+        p.y += p.dy;
+        p.alpha -= 0.025;
+        if (p.alpha <= 0) popups.splice(i, 1);
       }
-
-      if (shake > 0) shake *= 0.88;
     }
 
-    // Render Function
+    // Render Canvas
     function render() {
-      ctx.save();
-      if (shake > 0.4) {
-        ctx.translate((Math.random() - 0.5) * shake, (Math.random() - 0.5) * shake);
-      }
-
-      // Clear Screen with deep cosmic void
-      ctx.fillStyle = '#02040a';
+      // Clear Clean Pastel Background
+      ctx.fillStyle = '#f8fafc';
       ctx.fillRect(0, 0, W, H);
 
-      // Einstein Spacetime Curvature Grid (Curved towards active gravity well)
-      ctx.strokeStyle = 'rgba(99, 102, 241, 0.07)';
-      ctx.lineWidth = 1;
-      const step = 32;
-
-      for (let x = step; x < W; x += step) {
-        ctx.beginPath();
-        for (let y = 0; y <= H; y += 16) {
-          let px = x;
-          let py = y;
-          if (gravityWell.active) {
-            const dx = px - gravityWell.x;
-            const dy = py - gravityWell.y;
-            const d = Math.sqrt(dx * dx + dy * dy);
-            if (d < 160 && d > 1) {
-              const pull = Math.sin((1 - d / 160) * Math.PI * 0.5) * 22;
-              px -= (dx / d) * pull;
-              py -= (dy / d) * pull;
-            }
-          }
-          if (y === 0) ctx.moveTo(px, py);
-          else ctx.lineTo(px, py);
+      // Subtle Architect Dot Grid (Very refined, light grey)
+      ctx.fillStyle = '#cbd5e1';
+      for (let x = 24; x < W; x += 32) {
+        for (let y = 60; y < H - 60; y += 32) {
+          ctx.beginPath();
+          ctx.arc(x, y, 1.2, 0, Math.PI * 2);
+          ctx.fill();
         }
-        ctx.stroke();
       }
 
-      for (let y = step + 30; y < H - 30; y += step) {
-        ctx.beginPath();
-        for (let x = 0; x <= W; x += 16) {
-          let px = x;
-          let py = y;
-          if (gravityWell.active) {
-            const dx = px - gravityWell.x;
-            const dy = py - gravityWell.y;
-            const d = Math.sqrt(dx * dx + dy * dy);
-            if (d < 160 && d > 1) {
-              const pull = Math.sin((1 - d / 160) * Math.PI * 0.5) * 22;
-              px -= (dx / d) * pull;
-              py -= (dy / d) * pull;
-            }
-          }
-          if (x === 0) ctx.moveTo(px, py);
-          else ctx.lineTo(px, py);
-        }
-        ctx.stroke();
-      }
-
-      // Background Stars
-      for (let s of bgStars) {
-        const flicker = Math.sin(frame * 0.05 + s.flicker) * 0.2;
-        ctx.fillStyle = `rgba(255, 255, 255, ${Math.max(0.1, s.alpha + flicker)})`;
-        ctx.beginPath();
-        ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      // Draw Predicted Orbital Trajectory Line (Forward physics simulation!)
+      // Predicted Trajectory Arc (Clean minimalist dashed line)
       if (state === 'PLAYING') {
         ctx.save();
-        let simX = probe.x;
-        let simY = probe.y;
-        let simVx = probe.vx;
-        let simVy = probe.vy;
+        let simX = marble.x;
+        let simY = marble.y;
+        let simVx = marble.vx;
+        let simVy = marble.vy;
         ctx.beginPath();
         ctx.moveTo(simX, simY);
 
-        for (let step = 0; step < 26; step++) {
-          if (gravityWell.active) {
-            const dx = gravityWell.x - simX;
-            const dy = gravityWell.y - simY;
+        for (let step = 0; step < 22; step++) {
+          if (magnet.active) {
+            const dx = magnet.x - simX;
+            const dy = magnet.y - simY;
             const distSq = dx * dx + dy * dy;
             const dist = Math.sqrt(distSq);
-            if (dist > 18) {
-              const f = Math.min(1.4, (gravityWell.mass / Math.max(1200, distSq)) * 1.8);
+            if (dist > 16) {
+              const f = Math.min(1.3, (magnet.strength / Math.max(900, distSq)) * 1.6);
               simVx += (dx / dist) * f;
               simVy += (dy / dist) * f;
             }
@@ -787,72 +659,34 @@
           simY += simVy;
           ctx.lineTo(simX, simY);
         }
-        ctx.strokeStyle = gravityWell.active ? 'rgba(129, 140, 248, 0.45)' : 'rgba(56, 189, 248, 0.2)';
+        ctx.strokeStyle = magnet.active ? 'rgba(59, 130, 246, 0.45)' : 'rgba(148, 163, 184, 0.3)';
         ctx.setLineDash([4, 6]);
-        ctx.lineWidth = 1.8;
+        ctx.lineWidth = 2;
         ctx.stroke();
         ctx.setLineDash([]);
         ctx.restore();
       }
 
-      // Draw Active Gravity Well (Accretion Disk & Event Horizon)
-      if (gravityWell.active) {
+      // Magnetic Attraction Ripple (Water droplet expanding wave)
+      if (magnet.active) {
         ctx.save();
-        ctx.translate(gravityWell.x, gravityWell.y);
+        ctx.translate(magnet.x, magnet.y);
 
-        // Outer Gravitational Field Waves
-        const waveRad = 50 + (frame % 30) * 2;
-        ctx.strokeStyle = `rgba(99, 102, 241, ${Math.max(0, 0.4 - (frame % 30) / 30)})`;
-        ctx.lineWidth = 1.5;
+        // Water ripples
+        for (let r = 0; r < 3; r++) {
+          const rad = (30 + (frame * 1.5 + r * 22) % 65);
+          const alpha = Math.max(0, 0.4 - rad / 80);
+          ctx.strokeStyle = `rgba(59, 130, 246, ${alpha})`;
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.arc(0, 0, rad, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+
+        // Center Magnetic Core
+        ctx.fillStyle = '#3b82f6';
         ctx.beginPath();
-        ctx.arc(0, 0, waveRad, 0, Math.PI * 2);
-        ctx.stroke();
-
-        // Accretion disk
-        const diskGrad = ctx.createRadialGradient(0, 0, 8, 0, 0, 42);
-        diskGrad.addColorStop(0, 'rgba(129, 140, 248, 0.9)');
-        diskGrad.addColorStop(0.5, 'rgba(56, 189, 248, 0.4)');
-        diskGrad.addColorStop(1, 'rgba(99, 102, 241, 0)');
-        ctx.fillStyle = diskGrad;
-        ctx.beginPath();
-        ctx.arc(0, 0, 42, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Dark Event Horizon Core
-        ctx.fillStyle = '#02040a';
-        ctx.beginPath();
-        ctx.arc(0, 0, 14, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Glowing singularity ring
-        ctx.strokeStyle = '#c7d2fe';
-        ctx.lineWidth = 2.5;
-        ctx.shadowColor = '#818cf8';
-        ctx.shadowBlur = 16;
-        ctx.beginPath();
-        ctx.arc(0, 0, 14, 0, Math.PI * 2);
-        ctx.stroke();
-
-        ctx.restore();
-      }
-
-      // Draw Starshards (Crystalline Octahedrons)
-      for (let s of starshards) {
-        ctx.save();
-        ctx.translate(s.x, s.y);
-        ctx.rotate(s.rot);
-        const scale = 1 + Math.sin(s.pulse) * 0.15;
-        ctx.scale(scale, scale);
-
-        ctx.shadowColor = '#38bdf8';
-        ctx.shadowBlur = 12;
-        ctx.fillStyle = '#38bdf8';
-        ctx.beginPath();
-        ctx.moveTo(0, -s.radius);
-        ctx.lineTo(s.radius * 0.8, 0);
-        ctx.lineTo(0, s.radius);
-        ctx.lineTo(-s.radius * 0.8, 0);
-        ctx.closePath();
+        ctx.arc(0, 0, 8, 0, Math.PI * 2);
         ctx.fill();
 
         ctx.fillStyle = '#ffffff';
@@ -863,124 +697,277 @@
         ctx.restore();
       }
 
-      // Draw Quantum Portals (Hyperspace Gateway Rings)
-      for (let p of portals) {
+      // Draw Golden Brass Rings (Targets)
+      for (let r of rings) {
         ctx.save();
-        ctx.translate(p.x, p.y);
-        ctx.rotate(p.rot);
+        ctx.translate(r.x, r.y);
+        const p = 1 + Math.sin(r.pulse) * 0.08;
+        ctx.scale(p, p);
 
-        ctx.shadowColor = '#818cf8';
-        ctx.shadowBlur = 16;
-        ctx.strokeStyle = '#818cf8';
-        ctx.lineWidth = 2.5;
+        // Soft drop shadow
+        ctx.shadowColor = 'rgba(245, 158, 11, 0.25)';
+        ctx.shadowBlur = 12;
+
+        // Outer Brass Ring
+        ctx.strokeStyle = '#f59e0b';
+        ctx.lineWidth = 3.5;
         ctx.beginPath();
-        ctx.arc(0, 0, p.radius, 0, Math.PI * 2);
+        ctx.arc(0, 0, r.radius, 0, Math.PI * 2);
         ctx.stroke();
 
-        // Internal energy blades
-        for (let a = 0; a < Math.PI * 2; a += Math.PI / 2) {
-          ctx.beginPath();
-          ctx.moveTo(Math.cos(a) * 6, Math.sin(a) * 6);
-          ctx.lineTo(Math.cos(a) * (p.radius - 2), Math.sin(a) * (p.radius - 2));
-          ctx.stroke();
-        }
+        // Inner Golden Sparkle Core
+        ctx.fillStyle = '#fef3c7';
+        ctx.beginPath();
+        ctx.arc(0, 0, 4, 0, Math.PI * 2);
+        ctx.fill();
 
         ctx.restore();
       }
 
-      // Draw Void Hazards (Dark Matter Vortex)
-      for (let v of voids) {
+      // Draw Obsidian Blocks (Obstacles)
+      for (let b of blocks) {
         ctx.save();
-        ctx.translate(v.x, v.y);
-        ctx.rotate(v.rot);
+        ctx.translate(b.x, b.y);
 
-        ctx.shadowColor = '#f43f5e';
-        ctx.shadowBlur = 14;
-        ctx.fillStyle = '#1e1b4b';
-        ctx.beginPath();
-        ctx.arc(0, 0, v.radius, 0, Math.PI * 2);
-        ctx.fill();
-
-        ctx.strokeStyle = '#f43f5e';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.arc(0, 0, v.radius, 0, Math.PI * 2);
-        ctx.stroke();
-
-        // Swirling spikes
-        for (let a = 0; a < Math.PI * 2; a += Math.PI / 3) {
-          ctx.beginPath();
-          ctx.moveTo(Math.cos(a) * (v.radius - 4), Math.sin(a) * (v.radius - 4));
-          ctx.lineTo(Math.cos(a + 0.4) * (v.radius + 6), Math.sin(a + 0.4) * (v.radius + 6));
-          ctx.stroke();
-        }
-
-        ctx.restore();
-      }
-
-      // Draw Probe Light Trail
-      for (let i = 0; i < probe.trail.length; i++) {
-        const pt = probe.trail[i];
-        const rad = Math.max(1, probe.radius * (1 - i / probe.trail.length));
-        ctx.fillStyle = `rgba(129, 140, 248, ${pt.alpha * 0.7})`;
-        ctx.beginPath();
-        ctx.arc(pt.x, pt.y, rad, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      // Draw Quantum Probe Spark (The Player)
-      ctx.save();
-      ctx.translate(probe.x, probe.y);
-      ctx.shadowColor = '#38bdf8';
-      ctx.shadowBlur = 20;
-
-      // Radiant energy aura
-      ctx.fillStyle = '#38bdf8';
-      ctx.beginPath();
-      ctx.arc(0, 0, probe.radius + 3, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Bright white photon center
-      ctx.fillStyle = '#ffffff';
-      ctx.beginPath();
-      ctx.arc(0, 0, probe.radius - 1, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.restore();
-
-      // Particles
-      for (let pt of particles) {
-        ctx.save();
-        ctx.globalAlpha = Math.max(0, pt.alpha);
-        ctx.fillStyle = pt.color;
-        ctx.beginPath();
-        ctx.arc(pt.x, pt.y, pt.size, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-      }
-
-      // Callout Texts
-      for (let c of callouts) {
-        ctx.save();
-        ctx.globalAlpha = Math.max(0, c.alpha);
-        ctx.font = '800 13px -apple-system, sans-serif';
-        ctx.fillStyle = c.color;
-        ctx.shadowColor = c.color;
+        // Clay shadow
+        ctx.shadowColor = 'rgba(15, 23, 42, 0.15)';
         ctx.shadowBlur = 10;
-        ctx.textAlign = 'center';
-        ctx.fillText(c.text, c.x, c.y);
+        ctx.shadowOffsetY = 4;
+
+        // Smooth rounded pill
+        ctx.fillStyle = '#334155';
+        ctx.beginPath();
+        ctx.roundRect(-b.w / 2, -b.h / 2, b.w, b.h, 12);
+        ctx.fill();
+
         ctx.restore();
       }
 
+      // Smooth Liquid Trail
+      for (let i = 0; i < marble.trail.length; i++) {
+        const t = marble.trail[i];
+        const rad = Math.max(2, marble.radius * (1 - i / marble.trail.length) * 0.7);
+        ctx.fillStyle = `rgba(59, 130, 246, ${t.alpha * 0.25 * (1 - i / marble.trail.length)})`;
+        ctx.beginPath();
+        ctx.arc(t.x, t.y, rad, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Draw Chrome / Glass Marble (The Player)
+      ctx.save();
+      ctx.translate(marble.x, marble.y);
+
+      // Marble Soft Drop Shadow
+      ctx.shadowColor = 'rgba(15, 23, 42, 0.22)';
+      ctx.shadowBlur = 12;
+      ctx.shadowOffsetY = 6;
+
+      // Marble Base (Glossy Slate-Blue Gradient)
+      const marbleGrad = ctx.createRadialGradient(-3, -3, 2, 0, 0, marble.radius);
+      marbleGrad.addColorStop(0, '#ffffff');
+      marbleGrad.addColorStop(0.3, '#93c5fd');
+      marbleGrad.addColorStop(0.7, '#2563eb');
+      marbleGrad.addColorStop(1, '#1e3a8a');
+
+      ctx.fillStyle = marbleGrad;
+      ctx.beginPath();
+      ctx.arc(0, 0, marble.radius, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Specular Light Glint (Glass reflection)
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+      ctx.beginPath();
+      ctx.ellipse(-3.5, -4, 3, 1.8, -Math.PI / 4, 0, Math.PI * 2);
+      ctx.fill();
+
       ctx.restore();
-      requestAnimationFrame(loop);
+
+      // Sparkles
+      for (let sp of sparkles) {
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, sp.alpha);
+        ctx.fillStyle = sp.color;
+        ctx.beginPath();
+        ctx.arc(sp.x, sp.y, sp.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      // Floating Score Popups
+      for (let p of popups) {
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, p.alpha);
+        ctx.font = '800 13px -apple-system, sans-serif';
+        ctx.fillStyle = '#0f172a';
+        ctx.textAlign = 'center';
+        ctx.fillText(p.text, p.x, p.y);
+        ctx.restore();
+      }
+
+      // First-time In-Game Visual Guidance
+      if (state === 'PLAYING' && score === 0 && !magnet.active) {
+        ctx.save();
+        const pulse = 1 + Math.sin(frame * 0.1) * 0.1;
+        ctx.translate(W / 2, H / 2);
+        ctx.scale(pulse, pulse);
+        
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.75)';
+        ctx.beginPath();
+        ctx.roundRect(-100, -20, 200, 40, 20);
+        ctx.fill();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '700 12px -apple-system, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('👆 BASILI TUT / HOLD ANYWHERE', 0, 0);
+        ctx.restore();
+      }
+
+      requestAnimationFrame(render);
     }
 
     function loop() {
       update();
-      render();
     }
-    requestAnimationFrame(loop);
+    setInterval(loop, 1000 / 60);
+    requestAnimationFrame(render);
+
+    // ============================================
+    // ANIMATED VISUAL TUTORIAL LOOP (For visitors)
+    // ============================================
+    const tutCanvas = document.getElementById('tutorialCanvas');
+    if (tutCanvas) {
+      const tCtx = tutCanvas.getContext('2d');
+      let tFrame = 0;
+
+      function renderTutorial() {
+        tFrame++;
+        const cycle = tFrame % 210; // 3.5 seconds loop at 60fps
+        tCtx.clearRect(0, 0, 320, 120);
+
+        // Background
+        tCtx.fillStyle = '#f8fafc';
+        tCtx.fillRect(0, 0, 320, 120);
+
+        // Target Ring (At Right: x=245, y=60)
+        tCtx.save();
+        tCtx.translate(245, 60);
+        tCtx.strokeStyle = '#f59e0b';
+        tCtx.lineWidth = 3;
+        tCtx.beginPath();
+        tCtx.arc(0, 0, 15, 0, Math.PI * 2);
+        tCtx.stroke();
+        tCtx.fillStyle = '#fef3c7';
+        tCtx.beginPath();
+        tCtx.arc(0, 0, 3, 0, Math.PI * 2);
+        tCtx.fill();
+        tCtx.restore();
+
+        // Singularity / Touch Point (At Left-Center: x=110, y=60)
+        const touchX = 110;
+        const touchY = 60;
+        let marbleX = 35;
+        let marbleY = 60;
+
+        if (cycle < 60) {
+          // Phase 1: Finger presses down, marble moves toward finger
+          const t = cycle / 60;
+          marbleX = 35 + (touchX - 40 - 35) * t;
+          marbleY = 60 - 20 * Math.sin(t * Math.PI);
+
+          // Finger indicator
+          tCtx.fillStyle = '#3b82f6';
+          tCtx.beginPath();
+          tCtx.arc(touchX, touchY, 6, 0, Math.PI * 2);
+          tCtx.fill();
+
+          // Ripple
+          const rRad = (cycle % 25);
+          tCtx.strokeStyle = `rgba(59, 130, 246, ${1 - rRad / 25})`;
+          tCtx.beginPath();
+          tCtx.arc(touchX, touchY, rRad, 0, Math.PI * 2);
+          tCtx.stroke();
+
+          // Action Tag
+          tCtx.fillStyle = '#64748b';
+          tCtx.font = '700 11px -apple-system, sans-serif';
+          tCtx.fillText('1. BASILI TUT (HOLD)', 60, 22);
+
+        } else if (cycle < 130) {
+          // Phase 2: Orbiting around touch point and aiming
+          const ang = ((cycle - 60) / 70) * Math.PI * 2.2;
+          const rad = 28;
+          marbleX = touchX + Math.cos(ang) * rad;
+          marbleY = touchY + Math.sin(ang) * rad;
+
+          // Touch point active
+          tCtx.fillStyle = '#3b82f6';
+          tCtx.beginPath();
+          tCtx.arc(touchX, touchY, 7, 0, Math.PI * 2);
+          tCtx.fill();
+
+          // Dashed orbit circle
+          tCtx.strokeStyle = 'rgba(59, 130, 246, 0.3)';
+          tCtx.setLineDash([3, 4]);
+          tCtx.beginPath();
+          tCtx.arc(touchX, touchY, rad, 0, Math.PI * 2);
+          tCtx.stroke();
+          tCtx.setLineDash([]);
+
+          // Aim line toward ring
+          if (cycle > 105) {
+            tCtx.strokeStyle = 'rgba(245, 158, 11, 0.6)';
+            tCtx.setLineDash([2, 3]);
+            tCtx.beginPath();
+            tCtx.moveTo(marbleX, marbleY);
+            tCtx.lineTo(245, 60);
+            tCtx.stroke();
+            tCtx.setLineDash([]);
+          }
+
+          tCtx.fillStyle = '#0284c7';
+          tCtx.font = '700 11px -apple-system, sans-serif';
+          tCtx.fillText('2. YÖRÜNGEDE DÖNER (AIM)', 50, 22);
+
+        } else {
+          // Phase 3: Released! Marble shoots toward target ring
+          const t = (cycle - 130) / 80;
+          marbleX = (touchX + 28) + (245 - (touchX + 28)) * Math.min(1.2, t * 1.6);
+          marbleY = 60;
+
+          // Released finger symbol
+          tCtx.strokeStyle = '#94a3b8';
+          tCtx.strokeRect(touchX - 5, touchY - 5, 10, 10);
+
+          tCtx.fillStyle = '#10b981';
+          tCtx.font = '700 11px -apple-system, sans-serif';
+          tCtx.fillText('3. BIRAK & HEDEFİ VUR (SLING!)', 40, 22);
+
+          if (marbleX >= 240) {
+            // Sparkles & +100
+            tCtx.fillStyle = '#f59e0b';
+            tCtx.font = '800 12px sans-serif';
+            tCtx.fillText('+100', 270, 45);
+          }
+        }
+
+        // Draw Marble
+        tCtx.save();
+        tCtx.fillStyle = '#2563eb';
+        tCtx.beginPath();
+        tCtx.arc(marbleX, marbleY, 7, 0, Math.PI * 2);
+        tCtx.fill();
+        tCtx.fillStyle = '#ffffff';
+        tCtx.beginPath();
+        tCtx.arc(marbleX - 2, marbleY - 2, 2, 0, Math.PI * 2);
+        tCtx.fill();
+        tCtx.restore();
+
+        requestAnimationFrame(renderTutorial);
+      }
+      requestAnimationFrame(renderTutorial);
+    }
   </script>
 </body>
 </html>
