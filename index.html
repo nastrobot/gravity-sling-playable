@@ -254,15 +254,15 @@
       <div class="steps-box">
         <div class="step-item">
           <div class="step-num">1</div>
-          <div><b>Ekrana Basılı Tut / Hold:</b> Parmağın mıknatıs olur. Bilye parmağına çekilip dönmeye başlar.</div>
+          <div><b>Press & Hold Anywhere:</b> Manifests a magnetic center. The marble is pulled into an orbital arc.</div>
         </div>
         <div class="step-item">
           <div class="step-num">2</div>
-          <div><b>Halkaya Doğru Dönüşünü İzle:</b> Bilye dönerken gideceği rota kesik çizgilerle gösterilir.</div>
+          <div><b>Orbit & Aim:</b> The marble accelerates in orbit. Watch the dashed trajectory align with rings.</div>
         </div>
         <div class="step-item">
           <div class="step-num">3</div>
-          <div><b>Elini Kaldır / Release:</b> Altın halkaya denk gelince bırak, bilye sapan gibi fırlasın!</div>
+          <div><b>Release to Sling:</b> Release your touch to launch the marble through rings at high speed!</div>
         </div>
       </div>
 
@@ -820,7 +820,7 @@
         ctx.font = '700 12px -apple-system, sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText('👆 BASILI TUT / HOLD ANYWHERE', 0, 0);
+        ctx.fillText('👆 HOLD ANYWHERE TO ATTRACT', 0, 0);
         ctx.restore();
       }
 
@@ -892,7 +892,7 @@
           // Action Tag
           tCtx.fillStyle = '#64748b';
           tCtx.font = '700 11px -apple-system, sans-serif';
-          tCtx.fillText('1. BASILI TUT (HOLD)', 60, 22);
+          tCtx.fillText('1. PRESS & HOLD', 80, 22);
 
         } else if (cycle < 130) {
           // Phase 2: Orbiting around touch point and aiming
@@ -928,7 +928,7 @@
 
           tCtx.fillStyle = '#0284c7';
           tCtx.font = '700 11px -apple-system, sans-serif';
-          tCtx.fillText('2. YÖRÜNGEDE DÖNER (AIM)', 50, 22);
+          tCtx.fillText('2. ORBIT & AIM', 85, 22);
 
         } else {
           // Phase 3: Released! Marble shoots toward target ring
@@ -942,7 +942,7 @@
 
           tCtx.fillStyle = '#10b981';
           tCtx.font = '700 11px -apple-system, sans-serif';
-          tCtx.fillText('3. BIRAK & HEDEFİ VUR (SLING!)', 40, 22);
+          tCtx.fillText('3. RELEASE TO SLING!', 75, 22);
 
           if (marbleX >= 240) {
             // Sparkles & +100
